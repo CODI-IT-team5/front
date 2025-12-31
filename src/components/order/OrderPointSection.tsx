@@ -1,6 +1,7 @@
 import { getAxiosInstance } from "@/lib/api/axiosInstance";
 import { useOrderStore } from "@/store/orderStore";
 import { User } from "@/types/auth";
+import { ProductInfoData } from "@/types/Product";
 import { useQuery } from "@tanstack/react-query";
 
 export default function OrderPointSection() {
@@ -17,9 +18,7 @@ export default function OrderPointSection() {
 
   // 주문 상품의 총 가격 계산
   const totalProductPrice = selectedItems.reduce((sum, item) => {
-    const price = item.product.price;
-    const discountRate = item.product.discountRate;
-    const discountedPrice = price * (1 - discountRate / 100);
+    const discountedPrice = Math.floor((item.product as ProductInfoData).discountPrice ?? item.product.price * (1 - item.product.discountRate / 100));
     return sum + discountedPrice * item.quantity;
   }, 0);
 
