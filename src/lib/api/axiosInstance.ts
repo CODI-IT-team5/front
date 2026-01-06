@@ -34,18 +34,18 @@ export const getAxiosInstance = () => {
       const { response, config } = error;
       const status = response?.status;
       const isLoginRequest = config.url?.includes("/login") && config.method === "post";
-      const isLocalhost =
-        typeof window !== "undefined" &&
-        (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+      // const isLocalhost =
+      //   typeof window !== "undefined" &&
+      //   (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
 
       // 조건: 401 + 로그인 요청이 아님 + 리트라이 안 함
       if (status === 401 && !config._retry && !isLoginRequest) {
-        if (isLocalhost) {
-          alert("Access token이 만료되었습니다. 다시 로그인해주세요.");
-          useUserStore.getState().logout();
-          window.location.href = "/login";
-          return Promise.reject(error);
-        }
+        // if (isLocalhost) {
+        //   alert("Access token이 만료되었습니다. 다시 로그인해주세요.");
+        //   useUserStore.getState().logout();
+        //   window.location.href = "/login";
+        //   return Promise.reject(error);
+        // }
 
         config._retry = true;
 
