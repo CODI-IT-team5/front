@@ -1,4 +1,5 @@
 import { getAxiosInstance } from "@/lib/api/axiosInstance";
+import { uploadImageToS3 } from "@/lib/api/products";
 import { FavoriteStores } from "@/types/store";
 import { AxiosError } from "axios";
 
@@ -11,29 +12,38 @@ interface EditProfileParams {
 
 export const editUserProfile = async ({ currentPassword, nickname, newPassword, imageFile }: EditProfileParams) => {
   const axiosInstance = getAxiosInstance();
-  const formData = new FormData();
 
-  formData.append("currentPassword", currentPassword);
+  // 1. 이미지가 File이면 먼저 S3에 업로드
+  let imageId: string | undefined;
+  if (imageFile instanceof File) {
+    const uploadResult = await uploadImageToS3(imageFile);
+    imageId = uploadResult.id;
+  }
+
+  // 2. JSON body 생성
+  const body: {
+    currentPassword: string;
+    name?: string;
+    password?: string;
+    imageId?: string;
+  } = {
+    currentPassword,
+  };
 
   if (nickname && nickname.trim() !== "") {
-    formData.append("name", nickname.trim());
+    body.name = nickname.trim();
   }
 
   if (newPassword && newPassword.trim() !== "") {
-    formData.append("password", newPassword.trim());
+    body.password = newPassword.trim();
   }
 
-  if (imageFile) {
-    formData.append("image", imageFile);
+  if (imageId) {
+    body.imageId = imageId;
   }
 
   try {
-    const { data } = await axiosInstance.patch("/users/me", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-
+    const { data } = await axiosInstance.patch("/users/me", body);
     return data;
   } catch (err) {
     const error = err as AxiosError;

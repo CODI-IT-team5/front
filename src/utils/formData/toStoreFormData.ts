@@ -1,14 +1,26 @@
 import { StoreCreateForm } from "@/lib/schemas/storecreate.schema";
 
-export function toStoreFormData(data: StoreCreateForm): FormData {
-  const formData = new FormData();
-  formData.append("name", data.storeName);
-  formData.append("address", data.address.basic);
-  formData.append("detailAddress", data.address.detail ?? "");
-  formData.append("phoneNumber", data.phoneNumber);
-  formData.append("content", data.description);
-  if (data.image instanceof File) {
-    formData.append("image", data.image);
+interface StoreRequestBody {
+  name: string;
+  address: string;
+  detailAddress: string;
+  phoneNumber: string;
+  content: string;
+  imageId?: string;
+}
+
+export function toStoreRequestBody(data: StoreCreateForm, imageId?: string): StoreRequestBody {
+  const body: StoreRequestBody = {
+    name: data.storeName,
+    address: data.address.basic,
+    detailAddress: data.address.detail ?? "",
+    phoneNumber: data.phoneNumber,
+    content: data.description,
+  };
+
+  if (imageId) {
+    body.imageId = imageId;
   }
-  return formData;
+
+  return body;
 }

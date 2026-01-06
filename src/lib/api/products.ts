@@ -1,6 +1,6 @@
 import { ProductInfoData, ProductListResponse } from "@/types/Product";
 import { ProductInquiryResponse } from "@/types/inquiry";
-import { toProductFormData } from "@/utils/formData/toProductFormData";
+import { toProductRequestBody } from "@/utils/formData/toProductFormData";
 import { ProductFormValues } from "../schemas/productForm.schema";
 import { getAxiosInstance } from "./axiosInstance";
 
@@ -26,12 +26,19 @@ interface GetProductInquiryParams {
 // 새 상품 등록
 export const createProduct = async (data: ProductFormValues): Promise<ProductInfoData> => {
   const axiosInstance = getAxiosInstance();
-  const formData = toProductFormData(data);
-  const response = await axiosInstance.post("/products", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+
+  // 1. 이미지가 File이면 먼저 S3에 업로드
+  let imageId: string | undefined;
+  if (data.image instanceof File) {
+    const uploadResult = await uploadImageToS3(data.image);
+    imageId = uploadResult.id;
+  }
+
+  // 2. JSON body 생성
+  const body = toProductRequestBody(data, imageId);
+
+  // 3. 상품 생성 요청
+  const response = await axiosInstance.post("/products", body);
   return response.data;
 };
 
@@ -50,12 +57,19 @@ export const getProducts = async (params: GetProductsParams): Promise<ProductLis
 // 상품 수정 patch
 export const updateProduct = async (productId: string, data: ProductFormValues) => {
   const axiosInstance = getAxiosInstance();
-  const formData = toProductFormData(data);
-  const response = await axiosInstance.patch(`/products/${productId}`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+
+  // 1. 이미지가 File이면 먼저 S3에 업로드
+  let imageId: string | undefined;
+  if (data.image instanceof File) {
+    const uploadResult = await uploadImageToS3(data.image);
+    imageId = uploadResult.id;
+  }
+
+  // 2. JSON body 생성
+  const body = toProductRequestBody(data, imageId);
+
+  // 3. 상품 수정 요청
+  const response = await axiosInstance.patch(`/products/${productId}`, body);
   return response.data;
 };
 
@@ -95,7 +109,7 @@ export const postProductInquiry = async ({ productId, ...body }: PostInquiryPara
 };
 
 // 상품 등록 - 이미지
-export const uploadImageToS3 = async (file: File): Promise<{ url: string }> => {
+export const uploadImageToS3 = async (file: File): Promise<{ url: string; key: string; id: string }> => {
   const axiosInstance = getAxiosInstance();
   const formData = new FormData();
   formData.append("image", file);

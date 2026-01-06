@@ -1,19 +1,27 @@
 import { StoreCreateForm } from "@/lib/schemas/storecreate.schema";
 import { MyProductsResponse } from "@/types/sellerProduct";
 import { Store, StoreDetailResponse } from "@/types/store";
-import { toStoreFormData } from "@/utils/formData/toStoreFormData";
+import { toStoreRequestBody } from "@/utils/formData/toStoreFormData";
 import axios from "axios";
 import { getAxiosInstance } from "./axiosInstance";
+import { uploadImageToS3 } from "./products";
 
 // 스토어 등록
 export async function createStore(data: StoreCreateForm): Promise<StoreDetailResponse> {
   const axiosInstance = getAxiosInstance();
-  const formData = toStoreFormData(data);
-  const res = await axiosInstance.post("/stores", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+
+  // 1. 이미지가 File이면 먼저 S3에 업로드
+  let imageId: string | undefined;
+  if (data.image instanceof File) {
+    const uploadResult = await uploadImageToS3(data.image);
+    imageId = uploadResult.id;
+  }
+
+  // 2. JSON body 생성
+  const body = toStoreRequestBody(data, imageId);
+
+  // 3. 스토어 생성 요청
+  const res = await axiosInstance.post("/stores", body);
   return res.data;
 }
 
@@ -34,12 +42,19 @@ export const getMyStore = async (): Promise<StoreDetailResponse | null> => {
 // 스토어 수정
 export async function editStore(storeId: string, data: StoreCreateForm): Promise<StoreDetailResponse> {
   const axiosInstance = getAxiosInstance();
-  const formData = toStoreFormData(data);
-  const response = await axiosInstance.patch(`/stores/${storeId}`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+
+  // 1. 이미지가 File이면 먼저 S3에 업로드
+  let imageId: string | undefined;
+  if (data.image instanceof File) {
+    const uploadResult = await uploadImageToS3(data.image);
+    imageId = uploadResult.id;
+  }
+
+  // 2. JSON body 생성
+  const body = toStoreRequestBody(data, imageId);
+
+  // 3. 스토어 수정 요청
+  const response = await axiosInstance.patch(`/stores/${storeId}`, body);
   return response.data;
 }
 
