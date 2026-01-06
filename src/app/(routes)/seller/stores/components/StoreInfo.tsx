@@ -11,6 +11,7 @@ export interface StoreInfoProps {
     phoneNumber: string;
     favoriteCount: number;
     content: string;
+    imageId: string;
     image: string;
   };
 }
@@ -65,6 +66,7 @@ export function StoreInfo({ store }: StoreInfoProps) {
             detailAddress: store.detailAddress,
             phone: store.phoneNumber,
             content: store.content,
+            imageId: store.imageId,
             imageUrl: store.image,
           }}
         />

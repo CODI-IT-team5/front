@@ -11,10 +11,15 @@ export async function createStore(data: StoreCreateForm): Promise<StoreDetailRes
   const axiosInstance = getAxiosInstance();
 
   // 1. 이미지가 File이면 먼저 S3에 업로드
-  let imageId: string | undefined;
+  let imageId: string | undefined = data.imageId;
+
   if (data.image instanceof File) {
     const uploadResult = await uploadImageToS3(data.image);
-    imageId = uploadResult.id;
+    imageId = uploadResult.data.id;
+  }
+
+  if (!imageId) {
+    throw new Error("imageId is required");
   }
 
   // 2. JSON body 생성
@@ -44,10 +49,17 @@ export async function editStore(storeId: string, data: StoreCreateForm): Promise
   const axiosInstance = getAxiosInstance();
 
   // 1. 이미지가 File이면 먼저 S3에 업로드
-  let imageId: string | undefined;
+  let imageId = data.imageId;
+
   if (data.image instanceof File) {
     const uploadResult = await uploadImageToS3(data.image);
-    imageId = uploadResult.id;
+    imageId = uploadResult.data.id;
+    console.log(uploadResult);
+    console.log(imageId);
+  }
+
+  if (!imageId) {
+    throw new Error("imageId is required");
   }
 
   // 2. JSON body 생성

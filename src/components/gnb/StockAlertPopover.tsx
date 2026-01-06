@@ -39,6 +39,7 @@ export default function StockAlertPopover() {
     },
     getNextPageParam: (lastPage, allPages) => {
       // 마지막 페이지의 아이템 수가 pageSize보다 적으면 더 이상 페이지가 없음
+      if (!lastPage || !lastPage.list) return undefined;
       if (lastPage.list.length < PAGE_SIZE) {
         return undefined;
       }
@@ -49,7 +50,7 @@ export default function StockAlertPopover() {
   });
 
   // 모든 페이지의 알림을 하나의 배열로 합치기
-  const notifications = notificationData?.pages.flatMap((page) => page.list) ?? [];
+  const notifications = notificationData?.pages.flatMap((page) => page?.list ?? []).filter(Boolean) ?? [];
 
   // 알림 읽음 처리
   const mutation = useMutation({

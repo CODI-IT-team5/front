@@ -36,7 +36,7 @@ export function ProductDetailSection({
       const file = input.files[0];
       try {
         const response = await uploadImageToS3(file);
-        const imageUrl = response.url;
+        const imageUrl = response.data.url;
 
         const editor = quillRef.current?.getEditor();
         if (!editor) {

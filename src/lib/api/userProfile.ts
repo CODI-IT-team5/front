@@ -17,7 +17,7 @@ export const editUserProfile = async ({ currentPassword, nickname, newPassword, 
   let imageId: string | undefined;
   if (imageFile instanceof File) {
     const uploadResult = await uploadImageToS3(imageFile);
-    imageId = uploadResult.id;
+    imageId = uploadResult.data.id;
   }
 
   // 2. JSON body 생성

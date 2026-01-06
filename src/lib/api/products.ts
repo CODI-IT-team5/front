@@ -31,7 +31,7 @@ export const createProduct = async (data: ProductFormValues): Promise<ProductInf
   let imageId: string | undefined;
   if (data.image instanceof File) {
     const uploadResult = await uploadImageToS3(data.image);
-    imageId = uploadResult.id;
+    imageId = uploadResult.data.id;
   }
 
   // 2. JSON body 생성
@@ -62,7 +62,7 @@ export const updateProduct = async (productId: string, data: ProductFormValues) 
   let imageId: string | undefined;
   if (data.image instanceof File) {
     const uploadResult = await uploadImageToS3(data.image);
-    imageId = uploadResult.id;
+    imageId = uploadResult.data.id;
   }
 
   // 2. JSON body 생성
@@ -109,7 +109,7 @@ export const postProductInquiry = async ({ productId, ...body }: PostInquiryPara
 };
 
 // 상품 등록 - 이미지
-export const uploadImageToS3 = async (file: File): Promise<{ url: string; key: string; id: string }> => {
+export const uploadImageToS3 = async (file: File): Promise<{ message: string; data: { url: string; key: string; id: string } }> => {
   const axiosInstance = getAxiosInstance();
   const formData = new FormData();
   formData.append("image", file);

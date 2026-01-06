@@ -54,13 +54,14 @@ export default function InquiryPage({
     },
     getNextPageParam: (lastPage, allPages) => {
       // 현재 페이지의 list가 비어있지 않으면 다음 페이지가 있다고 판단
+      if (!lastPage || !lastPage.list) return undefined;
       return lastPage.list.length > 0 ? allPages.length + 1 : undefined;
     },
     initialPageParam: 1,
   });
 
   // 모든 페이지의 문의 목록을 하나의 배열로 합치기
-  const inquiries = inquiryResponse?.pages.flatMap((page) => page.list) ?? [];
+  const inquiries = inquiryResponse?.pages.flatMap((page) => page?.list ?? []).filter(Boolean) ?? [];
 
   const { setTarget } = useIntersectionObserver({
     threshold: 0.5,

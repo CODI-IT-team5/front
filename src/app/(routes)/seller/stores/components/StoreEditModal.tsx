@@ -13,6 +13,7 @@ interface StoreEditModalProps {
     detailAddress?: string;
     phone: string;
     content: string;
+    imageId?: string;
     imageUrl?: string;
   };
 }
@@ -24,7 +25,12 @@ export default function StoreEditModal({ onClose, store }: StoreEditModalProps) 
 
   const handleEdit = async (data: StoreCreateForm) => {
     try {
-      await editStore(store.id, data);
+      // imageId가 있으면 data에 포함
+      const formData: StoreCreateForm = {
+        ...data,
+        imageId: store.imageId,
+      };
+      await editStore(store.id, formData);
 
       await queryClient.invalidateQueries({ queryKey: ["myStore"] });
       toaster("info", "스토어 정보를 수정했습니다");
