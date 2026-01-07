@@ -6,6 +6,7 @@ export interface Store {
   detailAddress?: string;
   phoneNumber: string;
   content: string;
+  imageId: string;
   image: string;
   createdAt: string;
   updatedAt: string;

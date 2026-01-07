@@ -38,6 +38,20 @@ export default function InquiryAnswerModal({ type, open, inquiry, onClose }: Inq
   const queryClient = useQueryClient();
   const toaster = useToaster();
   const [replyId, setReplyId] = useState<string | null>(null);
+  const [hasError, setHasError] = useState(false);
+
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm<inquiryReplyForm>({
+    resolver: zodResolver(inquiryReply),
+    defaultValues: {
+      contents: "",
+    },
+  });
 
   useEffect(() => {
     if (inquiry && type === "CompletedAnswer")
@@ -48,7 +62,7 @@ export default function InquiryAnswerModal({ type, open, inquiry, onClose }: Inq
           setValue("contents", data.reply.content);
         }
       });
-  }, [inquiry, replyId]);
+  }, [inquiry, replyId, setValue, type]);
 
   const statusTypeCheckValue = (WaitingAnswer: StatusTypeCheckValueType, CompletedAnswer: StatusTypeCheckValueType) =>
     type === "WaitingAnswer" ? WaitingAnswer : CompletedAnswer;
@@ -69,20 +83,6 @@ export default function InquiryAnswerModal({ type, open, inquiry, onClose }: Inq
       onClose();
     },
   });
-
-  const {
-    control,
-    handleSubmit,
-    setValue,
-    reset,
-    formState: { errors },
-  } = useForm<inquiryReplyForm>({
-    resolver: zodResolver(inquiryReply),
-    defaultValues: {
-      contents: "",
-    },
-  });
-  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     if (inquiry) {

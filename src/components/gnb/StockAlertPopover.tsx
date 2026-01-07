@@ -11,7 +11,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/ko";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 dayjs.extend(relativeTime);
 dayjs.locale("ko");
@@ -50,7 +50,10 @@ export default function StockAlertPopover() {
   });
 
   // 모든 페이지의 알림을 하나의 배열로 합치기
-  const notifications = notificationData?.pages.flatMap((page) => page?.list ?? []).filter(Boolean) ?? [];
+  const notifications = useMemo(
+    () => notificationData?.pages.flatMap((page) => page?.list ?? []).filter(Boolean) ?? [],
+    [notificationData?.pages]
+  );
 
   // 알림 읽음 처리
   const mutation = useMutation({
@@ -129,7 +132,7 @@ export default function StockAlertPopover() {
     connect();
 
     return () => eventSource?.close();
-  }, [toaster]);
+  }, [toaster, queryClient]);
 
   // 팝오버 열릴 때
   useEffect(() => {
