@@ -58,10 +58,6 @@ export async function editStore(storeId: string, data: StoreCreateForm): Promise
     console.log(imageId);
   }
 
-  if (!imageId) {
-    throw new Error("imageId is required");
-  }
-
   // 2. JSON body 생성
   const body = toStoreRequestBody(data, imageId);
 
