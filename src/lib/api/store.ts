@@ -61,6 +61,12 @@ export async function editStore(storeId: string, data: StoreCreateForm): Promise
   // 2. JSON body 생성
   const body = toStoreRequestBody(data, imageId ?? "");
 
+  // [수정됨] ESLint 규칙을 이 줄에서만 무시하도록 설정하여 빌드 에러 해결
+  if (body.imageId === "") {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (body as any).imageId = null;
+  }
+
   // 3. 스토어 수정 요청
   const response = await axiosInstance.patch(`/stores/${storeId}`, body);
   return response.data;
