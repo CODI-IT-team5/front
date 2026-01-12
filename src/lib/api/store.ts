@@ -59,7 +59,7 @@ export async function editStore(storeId: string, data: StoreCreateForm): Promise
   }
 
   // 2. JSON body 생성
-  const body = toStoreRequestBody(data, imageId);
+  const body = toStoreRequestBody(data, imageId ?? "");
 
   // 3. 스토어 수정 요청
   const response = await axiosInstance.patch(`/stores/${storeId}`, body);
