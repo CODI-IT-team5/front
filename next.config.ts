@@ -5,9 +5,17 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "**", // 이미지 테스트를 위한 외부 이미지 도메인 허용
+        hostname: "**", 
       },
     ],
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/proxy/:path*",
+        destination: "http://3.34.104.78/api/:path*", 
+      },
+    ];
   },
 };
 
