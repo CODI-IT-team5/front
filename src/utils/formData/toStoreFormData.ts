@@ -6,18 +6,21 @@ interface StoreRequestBody {
   detailAddress: string;
   phoneNumber: string;
   content: string;
-  imageId: string;
+  imageId?: string;
 }
 
-export function toStoreRequestBody(data: StoreCreateForm, imageId: string): StoreRequestBody {
-  const body: StoreRequestBody = {
+export function toStoreRequestBody(data: StoreCreateForm, imageId?: string): Partial<StoreRequestBody> {
+  const body: Partial<StoreRequestBody> = {
     name: data.storeName,
     address: data.address.basic,
     detailAddress: data.address.detail ?? "",
     phoneNumber: data.phoneNumber,
     content: data.description,
-    imageId,
   };
+
+  if (imageId) {
+    body.imageId = imageId;
+  }
 
   return body;
 }

@@ -44,7 +44,7 @@ export const getMyStore = async (): Promise<StoreDetailResponse | null> => {
   }
 };
 
-// 스토어 수정 [핵심 수정 부분]
+// 스토어 수정
 export async function editStore(storeId: string, data: StoreCreateForm): Promise<StoreDetailResponse> {
   const axiosInstance = getAxiosInstance();
 
@@ -59,19 +59,9 @@ export async function editStore(storeId: string, data: StoreCreateForm): Promise
   }
 
   // 2. JSON body 생성
-  // (Tip: imageId가 없으면 빈 문자열 ""을 넣어서 빌드 에러를 막습니다.)
-  const body = toStoreRequestBody(data, imageId ?? "");
+  const body = toStoreRequestBody(data, imageId);
 
-  // 3. 전송 전 데이터 정리 (여기가 해결책!)
-  // imageId가 빈 문자열("")인 경우, 이는 유효한 ID가 아니므로
-  // 아예 전송 데이터에서 imageId 필드를 삭제합니다.
-  // 이렇게 하면 백엔드는 이미지 변경 요청이 없는 것으로 간주합니다.
-  if (body.imageId === "") {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    delete (body as any).imageId;
-  }
-
-  // 4. 스토어 수정 요청
+  // 3. 스토어 수정 요청
   const response = await axiosInstance.patch(`/stores/${storeId}`, body);
   return response.data;
 }
